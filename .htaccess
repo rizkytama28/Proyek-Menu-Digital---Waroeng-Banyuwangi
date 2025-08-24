@@ -1,0 +1,11 @@
+RewriteEngine On
+
+# Kondisi: Hanya terapkan aturan jika file yang diminta BUKAN file sungguhan
+RewriteCond %{REQUEST_FILENAME} !-f
+# Kondisi: Dan juga BUKAN direktori sungguhan
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Aturan: Jika kondisi di atas terpenuhi,
+# secara internal alihkan permintaan ke file .html yang sesuai.
+# Contoh: permintaan untuk "/login" akan dialihkan ke "/login.html"
+RewriteRule ^([^/]+)/?$ $1.html [L]

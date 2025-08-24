@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rangkuman Pesanan - Waroeng Banyuwangi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://css.gg/css?family=Inter:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8B0000; --secondary: #E2725B; --accent-green: #9CAD84;
+            --background: #f7fafc; --text-dark: #333333;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--background); }
+        .font-display { font-family: 'Playfair Display', serif; }
+        .btn { padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-weight: 600; transition: all 0.2s; cursor: pointer; border: none; }
+        .btn-print { background-color: var(--accent-green); color: white; }
+        .btn-print:hover { background-color: #8aa176; }
+        .btn-back { background-color: #a0aec0; color: white; }
+        .btn-back:hover { background-color: #718096; }
+
+        /* Gaya khusus untuk mode cetak */
+        @media print {
+            body {
+                background-color: white;
+            }
+            #print-actions, #header-info {
+                display: none;
+            }
+            #receipt-container {
+                box-shadow: none;
+                border: none;
+                margin: 0;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
+
+    <div id="header-info" class="text-center mb-4">
+        <p class="text-gray-600">Ini adalah rangkuman pesanan Anda.</p>
+        <p class="text-gray-600">Anda bisa menunjukkan layar ini kepada petugas kasir.</p>
+    </div>
+
+    <!-- Kontainer Struk -->
+    <div id="receipt-container" class="bg-white w-full max-w-sm rounded-lg shadow-lg p-6">
+        <div class="text-center border-b-2 border-dashed pb-4">
+            <h1 class="font-display text-2xl" style="color: var(--primary);">Waroeng Banyuwangi</h1>
+            <p class="text-sm text-gray-500">Struk Pesanan Pelanggan</p>
+        </div>
+
+        <div id="order-details" class="my-4 text-sm text-gray-600">
+            <!-- Detail pesanan akan dimuat di sini oleh JavaScript -->
+        </div>
+
+        <div id="order-items" class="border-t border-b border-dashed py-4">
+            <!-- Item pesanan akan dimuat di sini -->
+        </div>
+
+        <div id="order-summary" class="pt-4 font-semibold">
+            <!-- Total akan dimuat di sini -->
+        </div>
+        
+        <div class="text-center mt-6 text-xs text-gray-500">
+            <p>Terima kasih atas kunjungan Anda!</p>
+            <p id="timestamp"></p>
+        </div>
+    </div>
+
+    <!-- Tombol Aksi -->
+    <div id="print-actions" class="mt-6 flex gap-4">
+        <button onclick="window.history.back()" class="btn btn-back">Kembali</button>
+        <button onclick="window.print()" class="btn btn-print">Cetak / Simpan PDF</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const orderDetailsContainer = document.getElementById('order-details');
+            const orderItemsContainer = document.getElementById('order-items');
+            const orderSummaryContainer = document.getElementById('order-summary');
+            const timestampContainer = document.getElementById('timestamp');
+
+            const formatCurrency = (number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
+
+            const orderDataJSON = sessionStorage.getItem('pesananUntukCetak');
+            
+            if (!orderDataJSON) {
+                document.body.innerHTML = '<p class="text-center text-red-500">Tidak ada data pesanan yang bisa ditampilkan. Silakan kembali dan buat pesanan terlebih dahulu.</p><button onclick="window.location.href=\'index\'" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded">Kembali ke Menu</button>';
+                return;
+            }
+
+            const orderData = JSON.parse(orderDataJSON);
+            const { cart, grandTotal, timestamp } = orderData;
+            
+            const orderDate = new Date(timestamp);
+            const formattedDate = orderDate.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+            const formattedTime = orderDate.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            
+            orderDetailsContainer.innerHTML = `
+                <div class="flex justify-between">
+                    <span>Tanggal:</span>
+                    <span>${formattedDate}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Waktu:</span>
+                    <span>${formattedTime}</span>
+                </div>
+            `;
+            timestampContainer.textContent = `Dicetak pada ${formattedDate}, ${formattedTime}`;
+
+            orderItemsContainer.innerHTML = '';
+            cart.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'mb-2';
+                const displayName = item.variant ? `${item.nama} (${item.variant})` : item.nama;
+                
+                // --- BAGIAN YANG DIPERBARUI ---
+                itemElement.innerHTML = `
+                    <div class="flex justify-between">
+                        <p class="font-semibold">${displayName}</p>
+                        <p class="font-semibold text-gray-500">[${item.kode}]</p>
+                    </div>
+                    <div class="flex justify-between text-sm text-gray-600">
+                        <span>${item.quantity} x ${formatCurrency(item.harga)}</span>
+                        <span>${formatCurrency(item.quantity * item.harga)}</span>
+                    </div>
+                `;
+                orderItemsContainer.appendChild(itemElement);
+            });
+
+            orderSummaryContainer.innerHTML = `
+                <div class="flex justify-between text-lg">
+                    <span>Total Bayar:</span>
+                    <span style="color: var(--primary);">${formatCurrency(grandTotal)}</span>
+                </div>
+            `;
+        });
+    </script>
+</body>
+</html>

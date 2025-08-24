@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Digital - Waroeng Banyuwangi</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="assets/css/style.css?v=6.0">
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-9FKRNT6FHG"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-9FKRNT6FHG');
+    </script>
+    <style>
+        .sticky-filters {
+            position: sticky;
+            top: 72px; 
+            z-index: 15; 
+            background-color: rgba(255, 251, 245, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding-top: 1rem;
+            padding-bottom: 0.5rem;
+            margin-left: -1rem; margin-right: -1rem;
+            padding-left: 1rem; padding-right: 1rem;
+        }
+        @media (min-width: 1024px) {
+            .sticky-filters {
+                top: 80px;
+                margin-left: 0; margin-right: 0;
+                padding-left: 0; padding-right: 0;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-lg shadow-md sticky top-0 z-20">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center gap-2">
+            <!-- Judul (Akan disembunyikan di HP saat search aktif) -->
+            <div id="header-title" class="header-title">
+                <h1 class="font-display text-2xl md:text-3xl" style="color: var(--primary);">Waroeng Banyuwangi</h1>
+            </div>
+
+            <!-- Kontainer Search (Awalnya tersembunyi di HP) -->
+            <div id="search-container" class="search-container flex-1 md:flex-initial md:max-w-xs absolute md:static top-0 left-0 w-full h-full bg-white/95 md:bg-transparent p-4 md:p-0 opacity-0 md:opacity-100 pointer-events-none md:pointer-events-auto transform -translate-x-4 md:transform-none">
+                <div class="relative w-full h-full flex items-center">
+                    <input type="search" id="search-input" class="search-input h-12" placeholder="Cari menu...">
+                    <!-- Tombol close sekarang punya padding sendiri -->
+                    <button id="close-search-btn" class="absolute right-0 top-1/2 -translate-y-1/2 p-4 md:hidden">
+                        <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Ikon Aksi (Search & Troli) -->
+            <div class="flex items-center gap-4 z-10">
+                <button id="open-search-btn" class="md:hidden">
+                    <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </button>
+                <a href="#cart-section" class="relative cursor-pointer flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                    <span id="cart-count" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 lg:p-8">
+        <div class="lg:grid lg:grid-cols-3 lg:gap-8">
+            <div class="lg:col-span-2">
+                <h2 class="font-display text-3xl mb-2">Menu Kami</h2>
+                <div class="bg-green-50 border-l-4 border-green-400 text-green-700 p-4 rounded-md mb-6" role="alert">
+                    <p class="font-bold">Tata Cara Pesan:</p>
+                    <ol class="list-decimal list-inside">
+                        <li>Pilih menu &amp; masukkan ke keranjang.</li>
+                        <li>Klik "Lanjutkan ke Pesanan" di keranjang.</li>
+                        <li>Tunjukkan layar pesanan pada kasir.</li>
+                    </ol>
+                </div>
+                
+                <div id="category-filters-container" class="sticky-filters mb-8"></div>
+                <div id="menu-container"></div>
+
+            </div>
+            <div id="cart-section" class="lg:col-span-1 mt-8 lg:mt-0">
+                 <div class="sticky top-24">
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h2 class="font-display text-2xl mb-4 border-b pb-2">Keranjang Anda</h2>
+                        <div id="cart-items" class="space-y-4 max-h-96 overflow-y-auto pr-2"></div>
+                        <div id="cart-summary" class="mt-6 border-t pt-4">
+                            <div class="flex justify-between items-center font-bold text-lg">
+                                <span>Total:</span>
+                                <span id="cart-total">Rp 0</span>
+                            </div>
+                            <button id="checkout-btn" class="w-full btn-primary font-bold py-3 px-4 rounded-lg mt-4 disabled:opacity-50" disabled>Lanjutkan ke Pesanan</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="checkout-modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+            <div class="p-6 border-b flex justify-between items-center">
+                <h3 class="font-display text-2xl">Detail Pesanan Anda</h3>
+                <button id="close-modal-btn" class="text-gray-500 hover:text-gray-800 text-3xl leading-none">&times;</button>
+            </div>
+            <div class="p-6 overflow-y-auto">
+                <p class="mb-4 text-center">Tunjukkan rincian ini kepada kasir.</p>
+                <div id="checkout-summary-table" class="w-full"></div>
+            </div>
+            <div class="p-6 bg-gray-50 border-t flex flex-col sm:flex-row justify-end gap-3">
+                 <button id="close-modal-btn-2" class="btn-secondary font-bold py-2 px-4 rounded-lg order-2 sm:order-1">Tutup</button>
+                 <button id="print-btn" class="btn-add font-bold py-2 px-4 rounded-lg order-1 sm:order-2">Cetak Struk Pesanan</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="assets/js/app.js?v=5.0"></script>
+</body>
+</html>

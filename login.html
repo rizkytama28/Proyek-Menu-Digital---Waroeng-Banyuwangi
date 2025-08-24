@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Admin - Waroeng Banyuwangi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- CSS dari file eksternal tidak diperlukan lagi karena digabung di sini -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8B0000;
+            --secondary: #E2725B;
+            --accent-green: #9CAD84;
+            --background: #FFFBF5; /* Latar belakang krem lembut */
+            --text-dark: #333333;
+            --text-light: #FFFFFF;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background); /* Menggunakan warna latar belakang utama */
+        }
+        .font-display {
+            font-family: 'Playfair Display', serif;
+        }
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--text-light);
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #6d0000;
+            transform: scale(1.02);
+        }
+        .btn-primary:disabled {
+            background-color: #a0aec0;
+            cursor: not-allowed;
+        }
+        .form-input {
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .form-input:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(226, 114, 91, 0.3);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center h-screen p-4">
+    <div class="w-full max-w-sm bg-white rounded-lg shadow-xl p-8 mx-auto">
+        <div class="text-center mb-8">
+            <h1 class="font-display text-3xl" style="color: var(--primary);">Admin Login</h1>
+            <p class="text-gray-500">Waroeng Banyuwangi</p>
+        </div>
+        <form id="login-form">
+            <div class="mb-4">
+                <label for="username" class="block text-gray-700 text-sm font-bold mb-2">Username</label>
+                <input type="text" id="username" class="form-input shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none" required>
+            </div>
+            <div class="mb-6">
+                <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                <input type="password" id="password" class="form-input shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none" required>
+            </div>
+            <div class="flex items-center justify-between">
+                <button type="submit" id="login-button" class="btn-primary w-full font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Masuk
+                </button>
+            </div>
+            <p id="error-message" class="text-red-500 text-center mt-4 text-sm h-4"></p>
+        </form>
+    </div>
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('error-message');
+            const loginButton = document.getElementById('login-button');
+
+            errorMessage.textContent = '';
+            loginButton.textContent = 'Memproses...';
+            loginButton.disabled = true;
+            
+            try {
+                // --- BAGIAN YANG DIPERBARUI ---
+                // Path ke API diubah menjadi absolut untuk memastikan selalu benar.
+                // Sesuaikan '/waroeng-banyuwangi/' jika nama folder Anda berbeda.
+                const response = await fetch('/api/login.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (!response.ok) {
+                    // Cek jika error 404 karena path salah
+                    if(response.status === 404) {
+                         throw new Error('File API tidak ditemukan. Periksa path folder.');
+                    }
+                    throw new Error('Terjadi masalah pada server.');
+                }
+
+                const result = await response.json();
+
+                if (result.success) {
+                    window.location.href = 'admin';
+                } else {
+                    errorMessage.textContent = result.message || 'Username atau password salah.';
+                }
+            } catch (error) {
+                errorMessage.textContent = error.message || 'Tidak dapat terhubung ke server.';
+            } finally {
+                loginButton.textContent = 'Masuk';
+                loginButton.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
